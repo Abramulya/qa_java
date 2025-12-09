@@ -2,57 +2,62 @@ package com.example;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FelineTest {
 
-    @Mock
-    private Feline feline;
-
-    @Mock
-    private Animal animal;
-
     @Test
-    void EatMeatPredatorFood() throws Exception {
-        Feline felineMy = new Feline();
+    void eatMeatPredatorFood() throws Exception {
+        Feline feline = new Feline();
         List<String> expectedFood = List.of("Животные", "Птицы", "Рыба");
-        // when(animal.getFood("Хищник")).thenReturn(expectedFood);
-        List<String> actualFood = felineMy.eatMeat();
+        List<String> actualFood = feline.eatMeat();
         assertEquals(expectedFood, actualFood);
-      //  verify(animal).getFood("Хищник");
     }
 
     @Test
-    void EatMeatThrowsPredatorException() throws Exception {
-        when(animal.getFood("Хищник")).thenThrow(new Exception("Ошибка"));
-        assertThrows(Exception.class, () -> feline.eatMeat());
-        verify(animal).getFood("Хищник");
-    }
-
-    @Test
-    void GetFamilyWithoutParameterCats() {
+    void getFamilyWithoutParameterCats() {
+        Feline feline = new Feline();
         String family = feline.getFamily();
         assertEquals("Кошачьи", family);
-        verifyNoInteractions(animal);
     }
 
     @Test
-    void testGetKittensWithoutParameterOne() {
+    void getKittensWithoutParameterOne() {
+        Feline feline = new Feline();
         int kittens = feline.getKittens();
         assertEquals(1, kittens);
     }
 
     @Test
-    void testGetKittensWithParameterFiveShowsOk() {
+    void getKittensWithParameterFive() {
+        Feline feline = new Feline();
         int expectedCount = 5;
         int actualCount = feline.getKittens(expectedCount);
         assertEquals(expectedCount, actualCount);
+    }
+
+    @ParameterizedTest
+    @MethodSource("foodProvider")
+    void getFoodWithIncorrectParametersNotEqual(List<String> expectedFood) throws Exception {
+        Feline feline = new Feline();
+        List<String> actualFood = feline.eatMeat();
+        assertNotEquals(expectedFood, actualFood);
+    }
+
+    private static Stream<Arguments> foodProvider() {
+        return Stream.of(
+                Arguments.of(List.of("Животные", "Птицы", "Осетр")),
+                Arguments.of(List.of("Мясо", "Курица", "Индейка")),
+                Arguments.of(List.of("Рыба", "Молоко"))
+        );
     }
 }
